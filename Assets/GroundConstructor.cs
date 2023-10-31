@@ -49,12 +49,16 @@ public class GroundConstructor : MonoBehaviour
         //wordList = new List<string>(AllPoints);
 
         // To test a certain number of lines
-        for (int i = 0; i <= (3*300); i++)
+        // Add only every xth line (for performance's sake, KEEP IT)
+        int xth = 40;
+        for (int i = 0; i < AllPoints.Length; i++)
         {
             if (AllPoints[i] != null)
-            wordList.Add(AllPoints[i]);
+                if (i % xth == 0)
+                    wordList.Add(AllPoints[i]);
         }
 
+        // Remove the first line, count line
         wordList.Remove(wordList[0]);
     }
 
@@ -148,10 +152,7 @@ public class GroundConstructor : MonoBehaviour
         Gizmos.color = Color.white;
         for (int i = 0; i < pointCloud.Count; i++)
         {
-            if (i == 0)
-                Gizmos.DrawLine(pointObjects[i].transform.position, pointObjects[i].transform.position + Vector3.up);
-            else 
-                Gizmos.DrawLine(pointObjects[i].transform.position, pointObjects[i-1].transform.position);
+            Gizmos.DrawLine(pointObjects[i].transform.position, pointObjects[i].transform.position + Vector3.up);
         }
     }
 }
