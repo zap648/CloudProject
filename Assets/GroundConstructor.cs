@@ -88,14 +88,14 @@ public class GroundConstructor : MonoBehaviour
                     {
                         // Set current temp as temp X value
                         tempX = float.Parse(temp, CultureInfo.InvariantCulture.NumberFormat);
-                        Debug.Log($"Converting temp {temp} to tempX");
+                        Debug.Log($"Converting temp to tempX");
                         xzyCount = 1;
                     }
                     else if (xzyCount == 1)
                     {
                         // Set current temp as temp Z value
                         tempZ = float.Parse(temp, CultureInfo.InvariantCulture.NumberFormat);
-                        Debug.Log($"Converting temp {temp} to tempZ");
+                        Debug.Log($"Converting temp to tempZ");
                         xzyCount = 2;
                     }
 
@@ -108,7 +108,7 @@ public class GroundConstructor : MonoBehaviour
                     {
                         // Set current temp as temp Y value
                         tempY = float.Parse(temp, CultureInfo.InvariantCulture.NumberFormat);
-                        Debug.Log($"Converting temp {temp} to tempY");
+                        Debug.Log($"Converting temp to tempY");
 
                         // Due to being start of a new line, set current values in the pointCloud list
                         pointCloud.Add(new Vector3((float)tempX, (float)tempY, (float)tempZ));
