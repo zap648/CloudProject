@@ -131,12 +131,15 @@ public class GroundConstructor : MonoBehaviour
     void PlacePoints(List<Vector3> points)
     {
         // Getting the average so that the points come closer to the somewhat stable orego
-        Vector3 average = Vector3.zero;
-        for (int i = 0; i < points.Count; i++)
-        {
-            average += points[i];
-        }
-        average /= points.Count;
+        Vector3 average = new Vector3(points.Average(x=>x.x), points.Average(x=>x.y), points.Average(x=>x.z));
+
+        
+        //for (int i = 0; i < points.Count; i++)
+        //{
+        //    average += points[i];
+        //}
+        //average /= points.Count;
+        Debug.Log($"Center point is {average}");
 
         // Creation of the gameObject points
         for (int i = 0; i < points.Count; i++) 
