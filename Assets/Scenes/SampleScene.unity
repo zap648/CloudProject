@@ -455,12 +455,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cloudFile: {fileID: 4900000, guid: b361a2e42796b1f4b8bbe45e51cd7655, type: 3}
-  point: {fileID: 8978521360802890990, guid: d3d79009e1c1f5a4a8d79df8d9063dfb, type: 3}
+  pointPreFab: {fileID: 8978521360802890990, guid: d3d79009e1c1f5a4a8d79df8d9063dfb,
+    type: 3}
   pointBasket: {fileID: 200780653}
+  midPoint: {x: 0, y: 0, z: 0}
   pointAmount: 0
-  wordList: []
-  pointCloud: []
-  pointObjects: []
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
