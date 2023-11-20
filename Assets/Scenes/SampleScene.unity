@@ -458,6 +458,7 @@ MonoBehaviour:
   pointPreFab: {fileID: 8978521360802890990, guid: d3d79009e1c1f5a4a8d79df8d9063dfb,
     type: 3}
   pointBasket: {fileID: 200780653}
+  gizmoScale: 0.1
   midPoint: {x: 0, y: 0, z: 0}
   pointAmount: 0
 --- !u!1 &832575517

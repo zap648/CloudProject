@@ -7,35 +7,36 @@ using UnityEngine;
 
 public class GroundConstructor : MonoBehaviour
 {
-    public TextAsset cloudFile;
-    public GameObject pointPreFab;
-    public GameObject pointBasket;
+    [SerializeField] TextAsset cloudFile;
+    [SerializeField] GameObject pointPreFab;
+    [SerializeField] GameObject pointBasket;
+    [SerializeField] float gizmoScale;
     [SerializeField] Vector3 midPoint;
     [SerializeField] int pointAmount;
-    private List<string> pointList;
     private List<Vector3> pointCloud;
     private List<Vector3> scaledCloud;
+    private Vector3 gizmoSize;
 
     // Start is called before the first frame update
     void Start()
     {
-        pointList = new List<string>();
-        pointCloud = new List<Vector3>();
         scaledCloud = new List<Vector3>();
+        gizmoSize = Vector3.up * gizmoScale;
 
         // To transfer the file to the unity list
         ReadFile(cloudFile);
 
         // To get amount of lines on the first line of the file
-        SetAmount(cloudFile);
+        //SetAmount(cloudFile);
 
-        // To transfer the list of string into a list of points
-        ListToPoints(pointList);
+        //// To transfer the list of string into a list of points
+        //ListToPoints(pointList);
 
         // To create the physical pointCloud
         //PlacePoints(scaledCloud);
 
         // Create triangles
+        CreateTriangles(scaledCloud);
     }
 
     // Update is called once per frame
@@ -49,8 +50,7 @@ public class GroundConstructor : MonoBehaviour
         // Set up variables
         string content = cloud.text;
         string[] allPoints = content.Split("\n");
-
-        pointList = new List<string>(allPoints);
+        List<string> pointList = new List<string>(allPoints);
 
         // Remove the first, count line
         pointList.Remove(pointList[0]);
@@ -149,20 +149,20 @@ public class GroundConstructor : MonoBehaviour
 
     void CreateTriangles(List<Vector3> points)
     {
-        // Finn trekantkoplingane frå punktlista
+        // Finn trekantkoplingane frå punktlista og skriv dei i indeksfili med trekantindeksi
+        // Holy fucking shit. Dette kjem i ein eigen funksjon
 
-        // Skriv indeksfili med trekantindeksi
 
         // Rendre trekantane frå koplingane/punkti
+        // Dette kan gjerast i ein eigen funksjon
+
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.white;
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.white;
 
-        for (int i = 0; i < scaledCloud.Count(); i++)
-        {
-            Gizmos.DrawLine(scaledCloud[i], scaledCloud[i] + Vector3.up);
-        }
-    }
+    //    for (int i = 0; i < scaledCloud.Count(); i++)
+    //        Gizmos.DrawLine(scaledCloud[i], scaledCloud[i] + gizmoSize);
+    //}
 }
