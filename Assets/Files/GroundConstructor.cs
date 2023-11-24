@@ -13,9 +13,14 @@ public class GroundConstructor : MonoBehaviour
     [SerializeField] float gizmoScale;
     [SerializeField] Vector3 midPoint;
     [SerializeField] int pointAmount;
+
     private List<Vector3> pointCloud;
     private List<Vector3> scaledCloud;
+
     private Vector3 gizmoSize;
+
+    private List<Triangle> triangles;
+
 
     // Start is called before the first frame update
     void Start()
@@ -23,26 +28,14 @@ public class GroundConstructor : MonoBehaviour
         scaledCloud = new List<Vector3>();
         gizmoSize = Vector3.up * gizmoScale;
 
-        // To transfer the file to the unity list
+        // To transfer the file to the list
         ReadFile(cloudFile);
 
         // To get amount of lines on the first line of the file
-        //SetAmount(cloudFile);
-
-        //// To transfer the list of string into a list of points
-        //ListToPoints(pointList);
-
-        // To create the physical pointCloud
-        //PlacePoints(scaledCloud);
+        SetAmount(cloudFile);
 
         // Create triangles
         CreateTriangles(scaledCloud);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     void ReadFile(TextAsset cloud)
@@ -70,45 +63,22 @@ public class GroundConstructor : MonoBehaviour
         int tryInt = 0;
         StreamWriter stream;
 
-        Debug.Log($"Den fyrste lina til fili segjer me hev {allPoints[0]} punkt");
         if (int.TryParse(allPoints[0], out tryInt))
         {
-            Debug.Log("Fyrste lina er eit tal!");
             if (count != int.Parse(allPoints[0]))
             {
-                stream = new StreamWriter(Application.dataPath + "/files/32-1-490-163-56.txt", false);
+                stream = new StreamWriter(Application.dataPath + "/files/points.txt", false);
                 stream.Write((count).ToString() + "\n" + content);
                 stream.Close();
-                Debug.Log($"No hev me {count} punkt, og fili segjer me hev {allPoints[0]} punkt");
             }
         }
         else
         {
-            Debug.Log("Fyrste lina er jo ikkje eit tal!");
-
             stream = new StreamWriter(Application.dataPath + "/files/32-1-490-163-56.txt", false);
             stream.Write((count + 1).ToString() + "\n" + content);
             stream.Close();
-            Debug.Log($"No hev me {count + 1} punkt, og fili segjer me hev {allPoints[0]} punkt");
         }
         pointAmount = count;
-        Debug.Log("Fili er no riktig");
-    }
-
-    void ListToPoints(List<string> list)
-    {
-        for (int i = 0; i < list.Count(); i++)
-            pointCloud.Add(StringToVector(list[i]));
-
-        //midPoint = new Vector3(pointCloud.Average(x => x.x), pointCloud.Average(x => x.y), pointCloud.Average(x => x.z));
-    }
-
-    void PlacePoints(List<Vector3> points)
-    {
-        // Creation of the gameObject points
-        for (int i = 0; i < points.Count(); i++)
-            // Create GameObject at location
-            Instantiate(pointPreFab, points[i], new Quaternion(0.0f, 0.0f, 0.0f, 0.0f)).transform.SetParent(pointBasket.transform);
     }
 
     Vector3 StringToVector(string str)
@@ -149,6 +119,11 @@ public class GroundConstructor : MonoBehaviour
 
     void CreateTriangles(List<Vector3> points)
     {
+        // Det kan hende at eg må få dette i same funksjon som den yver... fanden...
+
+        // Trekantene har punktindeksar i dei tri fyrste verdiane og nabotrekantindeksar i dei tri andre verdiane
+
+
         // Finn trekantkoplingane frå punktlista og skriv dei i indeksfili med trekantindeksi
         // Holy fucking shit. Dette kjem i ein eigen funksjon
 
