@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class Triangle : MonoBehaviour
 {
-    public int[] indices = new int[3];
-    public int[] neighbours = new int[3];
-    public Vector3 normal = Vector3.zero;
+    [Header("Points")]
+    public Vector3[] points = new Vector3[3];
+
+    [Header("Normal")]
+    public Vector3 normal;
+
+    [Header("Nabo")]
+    public GameObject[] t;
 }
