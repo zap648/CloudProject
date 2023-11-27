@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 4f93e8ad04a60224893329140a3cdd69, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -96,6 +96,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a535dc0d52a4b14dae690657967d00d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  indices: 000000000000000000000000
-  neighbours: 000000000000000000000000
+  points:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
   normal: {x: 0, y: 0, z: 0}
+  neighbour: []

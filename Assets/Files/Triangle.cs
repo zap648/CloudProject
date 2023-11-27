@@ -10,6 +10,9 @@ public class Triangle : MonoBehaviour
     [Header("Normal")]
     public Vector3 normal;
 
+    [Header("UVs")]
+    public Vector2 UV;
+
     [Header("Nabo")]
-    public GameObject[] t;
+    public GameObject[] neighbour;
 }

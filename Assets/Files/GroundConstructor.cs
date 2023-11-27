@@ -1,10 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
+using static UnityEditor.Searcher.SearcherWindow.Alignment;
 
 public class GroundConstructor : MonoBehaviour
 {
@@ -32,6 +35,7 @@ public class GroundConstructor : MonoBehaviour
     {
         scaledCloud = new List<Vector3>();
         triGrid = new List<List<Vector3>>();
+        triangles = new List<GameObject>();
         gizmoSize = Vector3.up * gizmoScale;
 
         // To transfer the file to the list
@@ -48,6 +52,7 @@ public class GroundConstructor : MonoBehaviour
     void Update()
     {
         gizmoSize = Vector3.up * gizmoScale;
+        triangleAmount = triangles.Count();
     }
 
     void ReadFile(TextAsset cloud)
@@ -125,6 +130,13 @@ public class GroundConstructor : MonoBehaviour
     Vector3 GetMidPoint(List<string> list)
     {
         Vector3 midPoint = new Vector3(StringToVector(list).Average(x => x.x), StringToVector(list).Average(x => x.y), StringToVector(list).Average(x => x.z));
+
+        return midPoint;
+    }
+
+    Vector3 GetMidPoint(List<Vector3> list)
+    {
+        Vector3 midPoint = new Vector3(list.Average(x => x.x), list.Average(x => x.y), list.Average(x => x.z));
 
         return midPoint;
     }
@@ -221,14 +233,23 @@ public class GroundConstructor : MonoBehaviour
                 triGrid[i].Add(grid[i][j][0]);
         }
 
-        //// render triangles
-        //// Draw a triangle mesh, square by square
-        //for (int i = 0; i < grid.Count() - 1; i++)
-        //    for (int j = 0; j < grid[i].Count() - 1; j++)
-        //    {
-        //        triangles.Add(Instantiate(trianglePrefab, triGrid[i][j], Quaternion.Euler(0.0f, 0.0f, 0.0f)));
-        //        triangles.Add(Instantiate(trianglePrefab, triGrid[i][j], Quaternion.Euler(0.0f, 0.0f, 0.0f)));
-        //    }
+        // render triangles
+        // Draw a triangle mesh, square by square
+        GameObject newTriangle = new GameObject();
+
+        for (int i = 0; i < triGrid.Count() - 1; i++)
+        {
+            for (int j = 0; j < triGrid[i].Count() - 1; j++)
+            {
+                newTriangle = (GameObject)Instantiate(trianglePrefab, Vector3.zero, Quaternion.Euler(0.0f, 0.0f, 0.0f), groundParent.transform);
+                triSetup(newTriangle, new Vector3[3] { triGrid[i][j], triGrid[i][j + 1], triGrid[i + 1][j] });
+                triangles.Add(newTriangle);
+
+                newTriangle = (GameObject)Instantiate(trianglePrefab, Vector3.zero, Quaternion.Euler(0.0f, 0.0f, 0.0f), groundParent.transform);
+                triSetup(newTriangle, new Vector3[3] { triGrid[i + 1][j + 1], triGrid[i + 1][j], triGrid[i][j + 1] });
+                triangles.Add(newTriangle);
+            }
+        }
     }
 
     bool isPointInsideRow(float checkAxis, float reqAxis, float resolution)
@@ -240,6 +261,65 @@ public class GroundConstructor : MonoBehaviour
             return false;
     }
 
+    void triSetup(GameObject tri, Vector3[] points) // 3 points is very much recommended
+    {
+        Mesh m = new Mesh();
+        MeshFilter mf = tri.GetComponent<MeshFilter>();
+        mf.mesh = m;
+
+        Triangle _tri = tri.GetComponent<Triangle>();
+        _tri.points[0] = points[0];
+        _tri.points[1] = points[1];
+        _tri.points[2] = points[2];
+
+        Vector3[] vArray = new Vector3[3];
+        int[] triArray = new int[3];
+
+        vArray[0] = _tri.points[0];
+        vArray[1] = _tri.points[1];
+        vArray[2] = _tri.points[2];
+
+        triArray[0] = 0;
+        triArray[1] = 1;
+        triArray[2] = 2;
+
+        Vector2[] uvs = new Vector2[3];
+
+        for (int i = 0; i < uvs.Length; i++)
+            uvs[i] = new Vector2(_tri.points[i].x, _tri.points[i].z);
+
+
+        setNormal(tri);
+
+        Vector3[] normals = new Vector3[3] { GetNormal(tri), GetNormal(tri), GetNormal(tri) };
+
+        m.vertices = vArray;
+        m.triangles = triArray;
+        m.uv = uvs;
+        m.normals = normals;
+    }
+
+    void setNormal(GameObject tri)
+    {
+        Triangle _tri = tri.GetComponent<Triangle>();
+
+        Vector3 v1 = _tri.points[1] - _tri.points[0];
+        Vector3 v2 = _tri.points[2] - _tri.points[0];
+
+        _tri.normal.x = v1.y * v2.z - v1.z * v2.y;
+        _tri.normal.y = v1.z * v2.x - v1.x * v2.z;
+        _tri.normal.z = v1.x * v2.y - v1.y * v2.x;
+
+        _tri.normal /= Mathf.Sqrt(Mathf.Pow(_tri.normal.x, 2) + Mathf.Pow(_tri.normal.y, 2) + Mathf.Pow(_tri.normal.z, 2));
+    }
+
+    Vector3 GetNormal(GameObject tri)
+    {
+        Triangle _tri = tri.GetComponent<Triangle>();
+
+        return _tri.normal;
+    }
+
     private void OnDrawGizmos()
     {
         //Gizmos.color = Color.white;
@@ -247,10 +327,10 @@ public class GroundConstructor : MonoBehaviour
         //for (int i = 0; i < scaledCloud.Count(); i++)
         //    Gizmos.DrawLine(scaledCloud[i], scaledCloud[i] + gizmoSize);
 
-        Gizmos.color = Color.green;
+        //Gizmos.color = Color.green;
 
-        for (int i = 0; i < triGrid.Count(); i++)
-            for (int j = 0; j < triGrid[i].Count(); j++)
-                Gizmos.DrawLine(triGrid[i][j], triGrid[i][j] + gizmoSize);
+        //for (int i = 0; i < triGrid.Count(); i++)
+        //    for (int j = 0; j < triGrid[i].Count(); j++)
+        //        Gizmos.DrawLine(triGrid[i][j], triGrid[i][j] + gizmoSize);
     }
 }
