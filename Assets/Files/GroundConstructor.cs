@@ -247,10 +247,12 @@ public class GroundConstructor : MonoBehaviour
             {
                 newTriangle = (GameObject)Instantiate(trianglePrefab, Vector3.zero, Quaternion.Euler(0.0f, 0.0f, 0.0f), groundParent.transform);
                 triSetup(newTriangle, new Vector3[3] { triGrid[i][j], triGrid[i][j + 1], triGrid[i + 1][j] });
+                newTriangle.name = $"Triangle{triangles.Count()}";
                 triangles.Add(newTriangle);
 
                 newTriangle = (GameObject)Instantiate(trianglePrefab, Vector3.zero, Quaternion.Euler(0.0f, 0.0f, 0.0f), groundParent.transform);
                 triSetup(newTriangle, new Vector3[3] { triGrid[i + 1][j + 1], triGrid[i + 1][j], triGrid[i][j + 1] });
+                newTriangle.name = $"Triangle{triangles.Count()}";
                 triangles.Add(newTriangle);
 
                 // Setting up the two newly created triangles as neighbours
@@ -310,6 +312,7 @@ public class GroundConstructor : MonoBehaviour
         for (int i = 0; i < uvs.Length; i++)
             uvs[i] = new Vector2(_tri.points[i].x, _tri.points[i].z);
 
+        _tri.UVs = uvs;
 
         setNormal(tri);
 
