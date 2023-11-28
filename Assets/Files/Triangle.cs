@@ -12,7 +12,7 @@ public class Triangle : MonoBehaviour
 
     [Header("UVs")]
     public Vector2 UV;
-
+    
     [Header("Nabo")]
-    public GameObject[] neighbour;
+    public GameObject[] neighbour = new GameObject[3];
 }

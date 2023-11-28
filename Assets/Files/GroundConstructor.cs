@@ -16,7 +16,8 @@ public class GroundConstructor : MonoBehaviour
     [SerializeField] GameObject trianglePrefab;
     [SerializeField] GameObject pointBasket;
     [SerializeField] GameObject groundParent;
-    [SerializeField] float gizmoScale;
+    [SerializeField] float pointScale;
+    [SerializeField] float gridScale;
     [SerializeField] Vector3 midPoint;
     [SerializeField] int pointAmount;
     [SerializeField] int triangleAmount;
@@ -25,7 +26,8 @@ public class GroundConstructor : MonoBehaviour
     private List<Vector3> scaledCloud;
     private List<List<Vector3>> triGrid;
 
-    private Vector3 gizmoSize;
+    private Vector3 pointSize;
+    private Vector3 gridSize;
 
     private List<GameObject> triangles;
 
@@ -36,7 +38,8 @@ public class GroundConstructor : MonoBehaviour
         scaledCloud = new List<Vector3>();
         triGrid = new List<List<Vector3>>();
         triangles = new List<GameObject>();
-        gizmoSize = Vector3.up * gizmoScale;
+        pointSize = Vector3.up * pointScale;
+        gridSize = Vector3.up * gridScale;
 
         // To transfer the file to the list
         ReadFile(cloudFile);
@@ -51,7 +54,8 @@ public class GroundConstructor : MonoBehaviour
     // Update is called every frame
     void Update()
     {
-        gizmoSize = Vector3.up * gizmoScale;
+        pointSize = Vector3.up * pointScale;
+        gridSize = Vector3.up * gridScale;
         triangleAmount = triangles.Count();
     }
 
@@ -158,7 +162,7 @@ public class GroundConstructor : MonoBehaviour
         {
             if (points[i].x > maxX) maxX = points[i].x;
             if (points[i].z > maxZ) maxZ = points[i].z;
-            if (points[i].x < minX) minX = points[i].x; // Eg skreiv "if (points[i].x < minZ)" Er det mogeleg?! Fy fanden!
+            if (points[i].x < minX) minX = points[i].x;
             if (points[i].z < minZ) minZ = points[i].z;
         }
         Debug.Log($"Minimum XZ: {minX}, {minZ} & maximum XZ: {maxX}, {maxZ}");
@@ -248,6 +252,24 @@ public class GroundConstructor : MonoBehaviour
                 newTriangle = (GameObject)Instantiate(trianglePrefab, Vector3.zero, Quaternion.Euler(0.0f, 0.0f, 0.0f), groundParent.transform);
                 triSetup(newTriangle, new Vector3[3] { triGrid[i + 1][j + 1], triGrid[i + 1][j], triGrid[i][j + 1] });
                 triangles.Add(newTriangle);
+
+                // Setting up the two newly created triangles as neighbours
+                triangles[triangles.Count() - 1].GetComponent<Triangle>().neighbour[0] = triangles[triangles.Count() - 2];
+                triangles[triangles.Count() - 2].GetComponent<Triangle>().neighbour[0] = triangles[triangles.Count() - 1];
+
+                // Setting up neighbours between a previous z-grid (if any previous grid)
+                if (j > 0)
+                {
+                    triangles[triangles.Count() - 2].GetComponent<Triangle>().neighbour[2] = triangles[triangles.Count() - 3];
+                    triangles[triangles.Count() - 3].GetComponent<Triangle>().neighbour[2] = triangles[triangles.Count() - 2];
+                }
+
+                // Setting up neighbours between a previous x-grid (if any previous grid)
+                if (i > 0)
+                {
+                    triangles[triangles.Count() - 2].GetComponent<Triangle>().neighbour[1] = triangles[(triangles.Count() - 2) - ((triGrid[i].Count() - 1) * 2 - 1)];
+                    triangles[(triangles.Count() - 2) - ((triGrid[i].Count() - 1) * 2 - 1)].GetComponent<Triangle>().neighbour[1] = triangles[triangles.Count() - 2];
+                }
             }
         }
     }
@@ -325,12 +347,12 @@ public class GroundConstructor : MonoBehaviour
         //Gizmos.color = Color.white;
 
         //for (int i = 0; i < scaledCloud.Count(); i++)
-        //    Gizmos.DrawLine(scaledCloud[i], scaledCloud[i] + gizmoSize);
+        //    Gizmos.DrawLine(scaledCloud[i], scaledCloud[i] + pointSize);
 
-        //Gizmos.color = Color.green;
+        //Gizmos.color = Color.black;
 
         //for (int i = 0; i < triGrid.Count(); i++)
         //    for (int j = 0; j < triGrid[i].Count(); j++)
-        //        Gizmos.DrawLine(triGrid[i][j], triGrid[i][j] + gizmoSize);
+        //        Gizmos.DrawLine(triGrid[i][j], triGrid[i][j] + gridSize);
     }
 }

@@ -101,4 +101,8 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
   normal: {x: 0, y: 0, z: 0}
-  neighbour: []
+  UV: {x: 0, y: 0}
+  neighbour:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
