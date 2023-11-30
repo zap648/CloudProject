@@ -7,6 +7,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor.PackageManager;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static UnityEditor.Searcher.SearcherWindow.Alignment;
 
 public class GroundConstructor : MonoBehaviour
@@ -152,7 +153,7 @@ public class GroundConstructor : MonoBehaviour
         float minX = 0.0f;
         float minZ = 0.0f;
 
-        int[] resolution = new int[2] { 10, 10 };
+        int[] resolution = new int[2] { 20, 20 };
 
         List<Vector2> convex = new List<Vector2>();
         List<List<List<Vector3>>> grid = new List<List<List<Vector3>>>();
@@ -239,18 +240,16 @@ public class GroundConstructor : MonoBehaviour
 
         // render triangles
         // Draw a triangle mesh, square by square
-        GameObject newTriangle = new GameObject();
-
         for (int i = 0; i < triGrid.Count() - 1; i++)
         {
             for (int j = 0; j < triGrid[i].Count() - 1; j++)
             {
-                newTriangle = (GameObject)Instantiate(trianglePrefab, Vector3.zero, Quaternion.Euler(0.0f, 0.0f, 0.0f), groundParent.transform);
+                GameObject newTriangle = Instantiate(trianglePrefab, Vector3.zero, Quaternion.Euler(Vector3.zero), groundParent.transform);
                 triSetup(newTriangle, new Vector3[3] { triGrid[i][j], triGrid[i][j + 1], triGrid[i + 1][j] });
                 newTriangle.name = $"Triangle{triangles.Count()}";
                 triangles.Add(newTriangle);
 
-                newTriangle = (GameObject)Instantiate(trianglePrefab, Vector3.zero, Quaternion.Euler(0.0f, 0.0f, 0.0f), groundParent.transform);
+                newTriangle = Instantiate(trianglePrefab, Vector3.zero, Quaternion.Euler(Vector3.zero), groundParent.transform);
                 triSetup(newTriangle, new Vector3[3] { triGrid[i + 1][j + 1], triGrid[i + 1][j], triGrid[i][j + 1] });
                 newTriangle.name = $"Triangle{triangles.Count()}";
                 triangles.Add(newTriangle);
@@ -322,6 +321,7 @@ public class GroundConstructor : MonoBehaviour
         m.triangles = triArray;
         m.uv = uvs;
         m.normals = normals;
+        tri.AddComponent<MeshCollider>();
     }
 
     void setNormal(GameObject tri)
@@ -343,6 +343,99 @@ public class GroundConstructor : MonoBehaviour
         Triangle _tri = tri.GetComponent<Triangle>();
 
         return _tri.normal;
+    }
+
+    public bool IsInsideGrid(GameObject thing)
+    {
+        // Setting up the thing's position, the min point of the grid and the highest point of the grid.
+        Vector3 position = thing.transform.position;
+        Vector3 minPoint = triGrid[0][0];
+        Vector3 maxPoint = triGrid.Last<List<Vector3>>().Last<Vector3>();
+
+        // To check whether the game object is inside of the ground grid
+        if (position.x > minPoint.x && 
+            position.z > minPoint.z &&
+            position.x < maxPoint.x && 
+            position.z < maxPoint.z)
+            return true; // The point is inside of the grid
+        else
+            return false; // The point is outside of the grid
+    }
+
+    public GameObject FindTriangle(GameObject thing)
+    {
+        Vector3 position = thing.transform.position;
+        Vector3 point0;
+        Vector3 point1;
+        Vector3 point2;
+
+        // Finding what triangle the thing is on, and returning the thing if any
+        if (IsInsideGrid(thing))
+        {
+            Debug.Log("Søkjer etter trekant...");
+            for (int i = 0; i < triangles.Count(); i++)
+            {
+                point0 = triangles[i].GetComponent<Triangle>().points[0];
+                point1 = triangles[i].GetComponent<Triangle>().points[1];
+                point2 = triangles[i].GetComponent<Triangle>().points[2];
+                if (CheckOnTriangle(point0, point1, point2, position))
+                    return triangles[i];
+            }
+            Debug.Log("Fann ingen trekant.");
+        }
+
+        return null;
+    }
+
+    public bool CheckOnTriangle(Vector3 A, Vector3 B, Vector3 C, Vector3 P)
+    {
+        Vector3 u = B - A;
+        Vector3 v = C - A;
+        Vector3 w = P - A;
+
+        //Vector2 A2 = new Vector2(A.x, A.z);
+        //Vector2 B2 = new Vector2(B.x, B.z);
+        //Vector2 C2 = new Vector2(C.x, C.z);
+
+        Vector3 vW = Vector3.Cross(v, w);
+        Vector3 vU = Vector3.Cross(v, u);
+
+        if (Vector3.Dot(vW, vU) < 0)
+        {
+            //Debug.Log("vW*vU '" + Vector3.Dot(vW, vU) + "' er mindre enn 0");
+            return false;
+        }
+        //Debug.Log("vW*vU '" + Vector3.Dot(vW, vU) + "' er større enn 0");
+
+        Vector3 uW = Vector3.Cross(u, w);
+        Vector3 uV = Vector3.Cross(u, v);
+
+        if (Vector3.Dot(uW, uV) < 0)
+        {
+            //Debug.Log("uW*uV '" + Vector3.Dot(uW, uV) + "' er mindre enn 0");
+            return false;
+        }
+        //Debug.Log("uW*uV '" + Vector3.Dot(uW, uV) + "' er større enn 0");
+
+        float denom = uV.magnitude;
+        float r = vW.magnitude / denom;
+        float t = uW.magnitude / denom;
+
+        //if (r <= 1) Debug.Log("r '" + r + "' er mindre enn eller lik 1");
+        //else Debug.Log("r '" + r + "' er større enn 1");
+
+        //if (t <= 1) Debug.Log("t '" + t + "' er mindre enn eller lik 1");
+        //else Debug.Log("t '" + t + "' er større enn 1");
+
+        //if (r + t <= 1) Debug.Log("r + t '" + (r + t) + "' er mindre enn eller lik 1");
+        //else Debug.Log("r + t '" + (r + t) + "' er større enn 1");
+
+        return (r <= 1 && t <= 1 && r + t <= 1);
+    }
+
+    public List<GameObject> GetTriangles()
+    {
+        return triangles;
     }
 
     private void OnDrawGizmos()
