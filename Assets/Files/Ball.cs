@@ -20,8 +20,12 @@ public class Ball : MonoBehaviour
     //[SerializeField] KuleLogg logg;
     public GameObject triangle;
     [SerializeField] Triangle tri;
-    [SerializeField] bool onTri = false;
+    public bool onTri = false;
     public GroundConstructor ground;
+
+    [Header("Logger")]
+    [SerializeField] List<Vector3> Logger;
+    [SerializeField] bool isLogging;
 
     // Start is called before the first frame update
     void Start()
@@ -38,12 +42,14 @@ public class Ball : MonoBehaviour
         //else 
         normal = Vector3.zero;
         position = transform.position;
+        isLogging = false;
     }
 
     // Update is called once per frame
     void Update()
     {
         Move();
+        Log();
     }
 
     void Move()
@@ -53,7 +59,7 @@ public class Ball : MonoBehaviour
             triangle = ground.FindTriangle(this.gameObject);
             if (triangle != null)
                 tri = triangle.GetComponent<Triangle>();
-    }
+        }
 
         if (tri == null)
             onTri = false;
@@ -71,7 +77,7 @@ public class Ball : MonoBehaviour
 
         acceleration = gravityAcc + normal;
         velocity += acceleration * Time.deltaTime;
-        position += velocity * Time.deltaTime;
+        position += velocity;
         transform.position = position;
     }
 
@@ -104,5 +110,21 @@ public class Ball : MonoBehaviour
 
         Debug.Log("Not on a triangle");
         return false;
+    }
+
+    void Log()
+    {
+        if (ground.IsInsideGrid(this.gameObject))
+            if (onTri)
+                isLogging = true;
+        else 
+                isLogging = false;
+
+        if (isLogging)
+            if (!ground.IsInsideGrid(this.gameObject))
+                isLogging = false;
+
+        if (isLogging)
+            Logger.Add(this.position);
     }
 }

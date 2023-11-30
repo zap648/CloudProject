@@ -39,6 +39,8 @@ public class BallManager : MonoBehaviour
             newBall.transform.position = position;
             newBall.GetComponent<Ball>().position = position;
             newBall.GetComponent<Ball>().velocity = Vector3.zero;
+            newBall.GetComponent<Ball>().onTri = false;
+            newBall.GetComponent<Ball>().triangle = null;
             newBall.SetActive(true);
             return newBall;
         }

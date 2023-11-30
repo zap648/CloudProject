@@ -153,7 +153,7 @@ public class GroundConstructor : MonoBehaviour
         float minX = 0.0f;
         float minZ = 0.0f;
 
-        int[] resolution = new int[2] { 20, 20 };
+        int[] resolution = new int[2] { 10, 10 };
 
         List<Vector2> convex = new List<Vector2>();
         List<List<List<Vector3>>> grid = new List<List<List<Vector3>>>();
